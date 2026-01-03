@@ -1,0 +1,8 @@
+[project]
+name = "OTIO-Reaper"
+version = "1.0.0"
+description = "OTIO to Reaper converter"
+dependencies = [
+  "opentimelineio",
+  "docopt",
+]
