@@ -13,3 +13,5 @@ Very basic, it works but is limited:
 
 ## Usage
 
+    ./converter.py my_film.otio
+    ./converter.py my_film.otio my_amazing_film.RPP
