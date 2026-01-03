@@ -4,7 +4,11 @@
 
 """
 Usage:
-    {self_filename} <input> <output>
+    {self_filename} <input> [options]
+
+Options:
+    -o --output <output>            output file (default: same as input file name with .RPP suffix)
+    --debug                         show debug output
 """
 
 import logging
@@ -93,7 +97,10 @@ def convert_otio_to_reaper(otio_file, output_rpp):
 
 
 # Main
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 args = docopt(__doc__.format(self_filename=Path(__file__).name))
+logging.basicConfig(level=logging.DEBUG if args['--debug'] else logging.INFO, format='%(message)s')
 
-convert_otio_to_reaper(Path(args["<input>"]).expanduser(), Path(args["<output>"]).expanduser())
+input_path = Path(args["<input>"]).expanduser()
+output_path = Path(args["--output"]).expanduser() if args["--output"] else input_path.with_suffix(".RPP")
+log.info(f"Writing {output_path}")
+convert_otio_to_reaper(input_path, output_path)
