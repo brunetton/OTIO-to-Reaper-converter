@@ -70,7 +70,7 @@ def convert_otio_to_reaper(otio_file, output_rpp):
                     case ".mov":
                         source_type = "VIDEO"
                     case ".wav":
-                        source_type = "WAV"
+                        source_type = "WAVE"
                     case _:
                         raise Exception(f"Unknow file extension: {url_path}")
 
