@@ -12,6 +12,7 @@ Options:
 """
 
 import logging
+import mimetypes
 from pathlib import Path
 
 import opentimelineio as otio
@@ -62,19 +63,24 @@ def convert_otio_to_reaper(otio_file, output_rpp):
 
                 # Convert generic URLs to paths
                 path = Path(item.media_reference.target_url)
+                mime_type, _ = mimetypes.guess_type(str(path))
+                url_extension = path.suffix.lower()
+
                 source_type = None
-                url_path = path.suffix.lower()
-                match url_path:
-                    case ".mp4":
+                if url_extension == ".opus":
+                    source_type = "OPUS"
+                elif mime_type:
+                    if mime_type.startswith("video/"):
                         source_type = "VIDEO"
-                    case ".mov":
-                        source_type = "VIDEO"
-                    case ".wav":
-                        source_type = "WAVE"
-                    case ".mp3":
-                        source_type = "MP3"
-                    case _:
-                        raise Exception(f"Unknow file extension: {url_path}")
+                    elif mime_type.startswith("audio/"):
+                        if mime_type == "audio/mpeg":
+                            source_type = "MP3"
+                        elif mime_type == "audio/wav":
+                            source_type = "WAVE"
+
+                if source_type is None:
+                    log.warning(f"⚠ Warning ⚠ Ignoring file {path}: Unknown or unsupported file type: {mime_type or path.suffix}")
+                    continue
 
                 # Bloc ITEM en texte pur
                 rpp_lines.append("    <ITEM")
