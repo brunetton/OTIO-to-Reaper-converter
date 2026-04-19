@@ -8,6 +8,7 @@ Usage:
 
 Options:
     -o --output <output>            output file (default: same as input file name with .RPP suffix)
+    --enable-videos                 enable videos of imported video files (disabled by default)
     --debug                         show debug output
 """
 
@@ -67,6 +68,7 @@ def convert_otio_to_reaper(otio_file, output_rpp):
                 url_extension = path.suffix.lower()
 
                 source_type = None
+                force_disable_video = False
                 if url_extension == ".opus":
                     source_type = "OPUS"
                 elif mime_type:
@@ -77,6 +79,11 @@ def convert_otio_to_reaper(otio_file, output_rpp):
                             source_type = "MP3"
                         elif mime_type == "audio/wav":
                             source_type = "WAVE"
+                        elif mime_type == "audio/mp4":
+                            source_type = "VIDEO" # Special case for .m4a files, which are audio but Reaper only supports them as video sources
+                            force_disable_video = True
+                else:
+                    log.debug(f"Could not guess MIME type for {path}")
 
                 if source_type is None:
                     log.warning(f"⚠ Warning ⚠ Ignoring file {path}: Unknown or unsupported file type: {mime_type or path.suffix}")
@@ -91,6 +98,8 @@ def convert_otio_to_reaper(otio_file, output_rpp):
                 rpp_lines.append(f"      <SOURCE {source_type}")
                 if source_type == "VIDEO":
                     rpp_lines.append(f"        HIRESPEAKS 1")  # Ask Reaper to build hi-res peaks
+                    if force_disable_video or not args["--enable-videos"]:
+                        rpp_lines.append(f"        VIDEO_DISABLED")
                 rpp_lines.append(f'        FILE "{path}"')
                 rpp_lines.append("      >")
                 rpp_lines.append("    >")
