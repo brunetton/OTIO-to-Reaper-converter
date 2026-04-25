@@ -50,6 +50,7 @@ def convert_otio_to_reaper(otio_file, output_rpp):
         rpp_lines.append("  <TRACK")
         rpp_lines.append(f'    NAME "{track.name or 'A' + str(track_number)}"')
 
+        ignored_elements = set()
         for item in track:
             if isinstance(item, otio.schema.Clip):
                 log.debug(f"  - Item: {item.name}")
@@ -87,6 +88,7 @@ def convert_otio_to_reaper(otio_file, output_rpp):
 
                 if source_type is None:
                     log.warning(f"⚠ Warning ⚠ Ignoring file {path}: Unknown or unsupported file type: {mime_type or path.suffix}")
+                    ignored_elements.add(path)
                     continue
 
                 # Bloc ITEM en texte pur
@@ -112,6 +114,12 @@ def convert_otio_to_reaper(otio_file, output_rpp):
     with open(output_rpp, "w", encoding="utf-8") as f:
         f.write("\n".join(rpp_lines))
 
+    # Log ignored elements count
+    if len(ignored_elements) > 0:
+        log.info("\nFINISHED")
+        log.info(f"⚠ Warning ⚠ {len(ignored_elements)} items were not imported due to unsupported file types:")
+        for element in ignored_elements:
+            log.info(f"  - {element.name}")
 
 # Main
 args = docopt(__doc__.format(self_filename=Path(__file__).name))
