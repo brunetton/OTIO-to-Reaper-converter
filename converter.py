@@ -78,7 +78,7 @@ def convert_otio_to_reaper(otio_file, output_rpp):
                     elif mime_type.startswith("audio/"):
                         if mime_type == "audio/mpeg":
                             source_type = "MP3"
-                        elif mime_type == "audio/wav":
+                        elif mime_type in ("audio/wav", "audio/x-wav", "audio/wave"):
                             source_type = "WAVE"
                         elif mime_type == "audio/mp4":
                             source_type = "VIDEO" # Special case for .m4a files, which are audio but Reaper only supports them as video sources
